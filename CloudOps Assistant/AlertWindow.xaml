@@ -1,0 +1,23 @@
+﻿<Window x:Class="CloudOps_Assistant.AlertWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CloudOps_Assistant"
+        mc:Ignorable="d"
+        Title="AlertWindow" Width="300"
+        SizeToContent="Height"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        MouseDown="Window_MouseDown">
+    <Grid>
+        <Border BorderThickness="1" Background="White" BorderBrush="Black">
+            <StackPanel Margin="10">
+                <TextBlock x:Name="alertWindow_NotificationText_TextBlock" TextWrapping="Wrap"></TextBlock>
+                <Button VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="55" Content="Dismiss" Click="Button_Click"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

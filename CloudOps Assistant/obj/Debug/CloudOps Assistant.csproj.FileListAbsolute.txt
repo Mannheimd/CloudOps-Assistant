@@ -1,0 +1,16 @@
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\bin\Debug\CloudOps Assistant.exe.config
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\bin\Debug\CloudOps Assistant.exe
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\bin\Debug\CloudOps Assistant.pdb
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Debug\CloudOps Assistant.csprojResolveAssemblyReference.cache
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Debug\AlertWindow.g.cs
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Debug\MainWindow.g.cs
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Debug\App.g.cs
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Debug\CloudOps Assistant_MarkupCompile.cache
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Debug\CloudOps Assistant_MarkupCompile.lref
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Debug\AlertWindow.baml
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Debug\MainWindow.baml
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Debug\CloudOps Assistant.g.resources
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Debug\CloudOps_Assistant.Properties.Resources.resources
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Debug\CloudOps Assistant.csproj.GenerateResource.Cache
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Debug\CloudOps Assistant.exe
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Debug\CloudOps Assistant.pdb
