@@ -11,12 +11,31 @@
         AllowsTransparency="True"
         Background="Transparent"
         ResizeMode="NoResize"
-        MouseDown="Window_MouseDown">
+        MouseDown="Window_MouseDown"
+        WindowStartupLocation="Manual"
+        ShowInTaskbar="False"
+        x:Name="Alert" MouseUp="Window_MouseUp" Deactivated="AlertWindow_Deactivated" Activated="AlertWindow_Activated">
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Window.Loaded">
+            <BeginStoryboard>
+                <Storyboard Name="FormFade">
+                    <DoubleAnimation  Name="FormFadeAnimation"
+                                  Storyboard.TargetName="Alert"
+                                  Storyboard.TargetProperty="(Window.Opacity)"
+                                  From="1.0"
+                                  To="0.7"
+                                  Duration="0:0:1"
+                                  AutoReverse="False"
+                                  RepeatBehavior="1x" />
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Window.Triggers>
     <Grid>
         <Border BorderThickness="1" Background="White" BorderBrush="Black">
             <StackPanel Margin="10">
                 <TextBlock x:Name="alertWindow_NotificationText_TextBlock" TextWrapping="Wrap"></TextBlock>
-                <Button VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="55" Content="Dismiss" Click="Button_Click"/>
+                <Button VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="55" Content="Dismiss" Click="AlertWindow_Dismiss_Button_Click"/>
             </StackPanel>
         </Border>
     </Grid>

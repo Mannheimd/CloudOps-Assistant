@@ -1,0 +1,15 @@
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\bin\Release\CloudOps Assistant.exe.config
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\bin\Release\CloudOps Assistant.exe
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\bin\Release\CloudOps Assistant.pdb
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Release\AlertWindow.g.cs
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Release\MainWindow.g.cs
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Release\App.g.cs
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Release\CloudOps Assistant_MarkupCompile.cache
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Release\CloudOps Assistant_MarkupCompile.lref
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Release\AlertWindow.baml
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Release\MainWindow.baml
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Release\CloudOps Assistant.g.resources
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Release\CloudOps_Assistant.Properties.Resources.resources
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Release\CloudOps Assistant.csproj.GenerateResource.Cache
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Release\CloudOps Assistant.exe
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Release\CloudOps Assistant.pdb

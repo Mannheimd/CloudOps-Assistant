@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CloudOps_Assistant"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="CloudOps Assistant" Height="200" Width="300" Closing="Application_Closing">
     <Grid>
-        
+        <Label Content="These aren't the droids you're looking for..." Margin="10,10,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
     </Grid>
 </Window>
