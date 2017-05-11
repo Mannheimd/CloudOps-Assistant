@@ -13,3 +13,4 @@ C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assista
 C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Release\CloudOps Assistant.csproj.GenerateResource.Cache
 C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Release\CloudOps Assistant.exe
 C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Release\CloudOps Assistant.pdb
+C:\Users\christopher.manders\Documents\Development\Github Repos\CloudOps Assistant\CloudOps Assistant\obj\Release\CloudOps Assistant.csprojResolveAssemblyReference.cache

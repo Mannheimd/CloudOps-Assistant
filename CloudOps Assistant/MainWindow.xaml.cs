@@ -15,6 +15,8 @@ namespace CloudOps_Assistant
         DispatcherTimer TicketRefreshTimer = new DispatcherTimer();
         public static DateTime LastNotificationTime = new DateTime();
         TimeSpan ReminderFrequencyTime = new TimeSpan(0, 15, 0);
+        int TicketUpdateErrorCount = 0;
+        int TicketUpdateErrorState = 0;
 
         static Stream iconStream = Application.GetResourceStream(new Uri("pack://application:,,,/CloudOps Assistant;component/Pelfusion-Long-Shadow-Media-Cloud.ico")).Stream;
         System.Windows.Forms.NotifyIcon ni = new System.Windows.Forms.NotifyIcon()
@@ -65,6 +67,7 @@ namespace CloudOps_Assistant
             bool TriggerTicketReminderNotification = false;
             int HighPriorityTicketCount = 0;
             int CriticalPriorityTicketCount = 0;
+            bool IsTicketXmlBlank = false;
 
             try
             {
@@ -121,10 +124,26 @@ namespace CloudOps_Assistant
 
                     AlertWindowHandler.OpenAlertWindow(Header, Body);
                 }
+
+                if (TicketUpdateErrorState == 1)
+                {
+                    TicketUpdateErrorState = 0;
+                    MessageBox.Show("Normal operation has resumed. Notifications will continue to appear as normal.", "CloudOps Assistant Error Resolved");
+                }
+
+                TicketUpdateErrorCount = 0;
+                TicketUpdateStatus_Label.Content = "Last successful update at " + DateTime.Now.ToLongTimeString();
             }
             catch (Exception error)
             {
-                MessageBox.Show("Unable to pull ticket information\n\n" + error.Message);
+                TicketUpdateErrorCount++;
+                TicketUpdateStatus_Label.Content = "Update failed " + TicketUpdateErrorCount.ToString() + " time(s)";
+
+                if (TicketUpdateErrorState == 0 && TicketUpdateErrorCount > 10)
+                {
+                    TicketUpdateErrorState = 1;                
+                    MessageBox.Show("Unable to pull ticket information from Infor. Monitor the ticket queue manually, another notification will appear when ticket information is being pulled correctly.", "CloudOps Assistant Error");
+                }
             }
         }
 
