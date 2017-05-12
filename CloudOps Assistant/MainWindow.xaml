@@ -5,8 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CloudOps_Assistant"
         mc:Ignorable="d"
-        Title="CloudOps Assistant" Height="200" Width="300" Closing="Application_Closing">
+        Title="CloudOps Assistant" Height="310" Width="1555" Closing="Application_Closing">
     <Grid>
         <Label x:Name="TicketUpdateStatus_Label"  Content="" Margin="10,10,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+        <ListView x:Name="CloudOps_TicketList_ListView" SelectionMode="Single" Margin="10,36,10,10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Ticket" Width="80" DisplayMemberBinding="{Binding TicketNumber}"/>
+                    <GridViewColumn Header="Received" Width="140" DisplayMemberBinding="{Binding AssignedDateCorrected}"/>
+                    <GridViewColumn Header="Status" Width="140" DisplayMemberBinding="{Binding StatusCode}"/>
+                    <GridViewColumn Header="Due Time" Width="140" DisplayMemberBinding="{Binding DueTime}"/>
+                    <GridViewColumn Header="Urgency" Width="100" DisplayMemberBinding="{Binding Urgency}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
     </Grid>
 </Window>

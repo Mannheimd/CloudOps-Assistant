@@ -7,16 +7,23 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 using System.IO;
+using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace CloudOps_Assistant
 {
     public partial class MainWindow : Window
     {
-        DispatcherTimer TicketRefreshTimer = new DispatcherTimer();
+        static string InforUrl = @"https://crm.crmcloud.infor.com:443"; // Have this set by a client-side stored value
+        static string InforDynamicUrl = null;
+        static string InforSystemUrl = null;
+        public static Dictionary<string, TimeSpan> TicketRequiredActionTimeDict = new Dictionary<string, TimeSpan>();
+
+        static DispatcherTimer TicketRefreshTimer = new DispatcherTimer();
         public static DateTime LastNotificationTime = new DateTime();
-        TimeSpan ReminderFrequencyTime = new TimeSpan(0, 15, 0);
-        int TicketUpdateErrorCount = 0;
-        int TicketUpdateErrorState = 0;
+        static TimeSpan ReminderFrequencyTime = new TimeSpan(0, 15, 0);
+        static int TicketUpdateErrorCount = 0;
+        static int TicketUpdateErrorState = 0;
 
         static Stream iconStream = Application.GetResourceStream(new Uri("pack://application:,,,/CloudOps Assistant;component/Pelfusion-Long-Shadow-Media-Cloud.ico")).Stream;
         System.Windows.Forms.NotifyIcon ni = new System.Windows.Forms.NotifyIcon()
@@ -38,17 +45,37 @@ namespace CloudOps_Assistant
 
             GetAlertWindowPosition();
 
-            TicketRefreshTimer.Tick += new EventHandler(TicketRefreshTimer_Tick);
-            TicketRefreshTimer.Interval = new TimeSpan(0, 0, 30);
-            TicketRefreshTimer.Start();
+            //WindowState = WindowState.Minimized;
+            //Hide();
 
-            RunTicketUpdate();
-
-            WindowState = WindowState.Minimized;
-            Hide();
+            StartupTasks();
         }
 
-        private void Application_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private async void StartupTasks()
+        {
+            // Temporary - Add Urgency KVPs into dict
+            TicketRequiredActionTimeDict.Add("Low", new TimeSpan(08, 00, 00));
+            TicketRequiredActionTimeDict.Add("Medium", new TimeSpan(04, 00, 00));
+            TicketRequiredActionTimeDict.Add("High", new TimeSpan(01, 00, 00));
+            TicketRequiredActionTimeDict.Add("Critical", new TimeSpan(01, 00, 00));
+
+            // Set Infor URLs
+            InforDynamicUrl = InforUrl + @"/sdata/slx/dynamic/-/";
+            InforSystemUrl = InforUrl + @"/sdata/slx/system/-/";
+
+            // Populate the ticket status dictionary
+            await InforTasks.GetTicketStatuses(InforSystemUrl);
+
+            // Start the clock...
+            TicketRefreshTimer.Tick += new EventHandler(TicketRefreshTimer_Tick);
+            TicketRefreshTimer.Interval = new TimeSpan(1, 0, 30);
+            TicketRefreshTimer.Start();
+
+            // Force an initial ticket update
+            await RunTicketUpdate();
+        }
+
+        private void Application_Closing(object sender, CancelEventArgs e)
         {
             ni.Dispose();
             ni = null;
@@ -67,26 +94,37 @@ namespace CloudOps_Assistant
             bool TriggerTicketReminderNotification = false;
             int HighPriorityTicketCount = 0;
             int CriticalPriorityTicketCount = 0;
-            bool IsTicketXmlBlank = false;
 
             try
             {
-                XmlDocument TicketXml = await InforTasks.RunNoAuthGet(@"https://si-ncl-appsrv1.ad.swiftpage.com/livechat/", @"data-slx.php");
+                // Get tickets from Infor and update the UI with the ticket list
+                CloudOps_TicketList_ListView.ItemsSource = await InforTasks.GetTicketInformation(InforDynamicUrl);
+
+                XmlDocument TicketXml = new XmlDocument();
 
                 XmlNodeList TicketList = TicketXml.GetElementsByTagName("slx:Ticket");
                 foreach (XmlNode Node in TicketList)
                 {
+                    // Get the SData Key
                     string TicketUID = Node.Attributes["sdata:key"].Value;
 
-                    XmlDocument NodeDoc = new XmlDocument();
-                    NodeDoc.LoadXml(Node.OuterXml);
+                    // Using this method to get around the whole XML Schema problem - create a new XmlDocument from the current node
+                    XmlDocument TicketNodeDoc = new XmlDocument();
+                    TicketNodeDoc.LoadXml(Node.OuterXml);
                     
-                    XmlNode AssignedDateNode = NodeDoc.GetElementsByTagName("slx:AssignedDate")[0];
+                    // Get the ticket assigned date
+                    XmlNode AssignedDateNode = TicketNodeDoc.GetElementsByTagName("slx:AssignedDate")[0];
                     DateTime AssignedDate = Convert.ToDateTime(AssignedDateNode.InnerText.Trim()).ToUniversalTime();
 
-                    XmlNode UrgencyNode = NodeDoc.GetElementsByTagName("slx:Description")[0];
+                    // Get the ticket urgency
+                    XmlNode UrgencyNode = TicketNodeDoc.GetElementsByTagName("slx:Description")[0];
                     string Urgency = UrgencyNode.InnerText;
 
+                    // Selecting History node - will pass this for filtering to get the date which the ticket was actually assigned to Ops
+                    XmlDocument HistoryNodeDoc = new XmlDocument();
+                    HistoryNodeDoc.LoadXml(HistoryNodeDoc.OuterXml);
+
+                    // If ticket is high or critical, assess for a notification
                     if (Urgency == "Critical" || Urgency == "High")
                     {
                         if (LastNotificationTime != new DateTime() && AssignedDate > LastNotificationTime)
@@ -257,5 +295,26 @@ namespace CloudOps_Assistant
 
             MainWindow.LastNotificationTime = DateTime.UtcNow;
         }
+    }
+
+    public class Ticket
+    {
+        public DateTime CreateDate { get; set; }
+        public DateTime AssignedDate { get; set; }
+        public DateTime AssignedDateCorrected { get; set; }
+        public string StatusCode { get; set; }
+        public string Subject { get; set; }
+        public string TicketNumber { get; set; }
+        public List<TicketHistory> TicketHistoryList = new List<TicketHistory>();
+        public string Urgency { get; set; }
+        public DateTime DueTime { get; set; }
+    }
+
+    public class TicketHistory
+    {
+        public DateTime CreateDate { get; set; }
+        public string FieldName { get; set; }
+        public string OldValue { get; set; }
+        public string NewValue { get; set; }
     }
 }
