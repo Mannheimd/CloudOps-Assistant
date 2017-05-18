@@ -9,6 +9,7 @@ using Microsoft.Win32;
 using System.IO;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Windows.Data;
 
 namespace CloudOps_Assistant
 {
@@ -64,7 +65,14 @@ namespace CloudOps_Assistant
             InforSystemUrl = InforUrl + @"/sdata/slx/system/-/";
 
             // Populate the ticket status dictionary
-            await InforTasks.GetTicketStatuses(InforSystemUrl);
+            try
+            {
+                await InforTasks.GetTicketStatuses(InforSystemUrl);
+            }
+            catch
+            {
+                MessageBox.Show("Unable to get ticket statuses. Tickets will show with status IDs. Try restarting the application.");
+            }
 
             // Start the clock...
             TicketRefreshTimer.Tick += new EventHandler(TicketRefreshTimer_Tick);
@@ -99,7 +107,12 @@ namespace CloudOps_Assistant
             {
                 // Get tickets from Infor and update the UI with the ticket list
                 CloudOps_TicketList_ListView.ItemsSource = await InforTasks.GetTicketInformation(InforDynamicUrl);
+                
+                // Sort tickets in UI by ActionTime percentage
+                CollectionView CloudOps_TicketList_CollectionView = (CollectionView)CollectionViewSource.GetDefaultView(CloudOps_TicketList_ListView.ItemsSource);
+                CloudOps_TicketList_CollectionView.SortDescriptions.Add(new SortDescription("PercentActionTimeUsed", ListSortDirection.Descending));
 
+                // All of the below is unused, keeping it for the ticket notification stuff
                 XmlDocument TicketXml = new XmlDocument();
 
                 XmlNodeList TicketList = TicketXml.GetElementsByTagName("slx:Ticket");
@@ -308,6 +321,8 @@ namespace CloudOps_Assistant
         public List<TicketHistory> TicketHistoryList = new List<TicketHistory>();
         public string Urgency { get; set; }
         public DateTime DueTime { get; set; }
+        public TimeSpan OpenTime { get; set; }
+        public int PercentActionTimeUsed { get; set; }
     }
 
     public class TicketHistory

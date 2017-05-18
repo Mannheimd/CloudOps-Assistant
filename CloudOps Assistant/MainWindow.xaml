@@ -15,6 +15,14 @@
                     <GridViewColumn Header="Received" Width="140" DisplayMemberBinding="{Binding AssignedDateCorrected}"/>
                     <GridViewColumn Header="Status" Width="140" DisplayMemberBinding="{Binding StatusCode}"/>
                     <GridViewColumn Header="Due Time" Width="140" DisplayMemberBinding="{Binding DueTime}"/>
+                    <GridViewColumn Header="Open Time" Width="140" DisplayMemberBinding="{Binding OpenTime}"/>
+                    <GridViewColumn Header="%" Width="140" x:Name="CloudOpsTicketList_PercentColumn">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <ProgressBar Minimum="0" Maximum="100" Value="{Binding PercentActionTimeUsed}" Width="{Binding ElementName=CloudOpsTicketList_PercentColumn, Path=Width}" Height="12" Background="#FFE6E6E6" Foreground="Red"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <GridViewColumn Header="Urgency" Width="100" DisplayMemberBinding="{Binding Urgency}"/>
                 </GridView>
             </ListView.View>
