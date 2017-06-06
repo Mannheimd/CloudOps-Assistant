@@ -110,7 +110,7 @@ namespace CloudOps_Assistant
                 
                 // Sort tickets in UI by ActionTime percentage
                 CollectionView CloudOps_TicketList_CollectionView = (CollectionView)CollectionViewSource.GetDefaultView(CloudOps_TicketList_ListView.ItemsSource);
-                CloudOps_TicketList_CollectionView.SortDescriptions.Add(new SortDescription("PercentActionTimeUsed", ListSortDirection.Descending));
+                CloudOps_TicketList_CollectionView.SortDescriptions.Add(new SortDescription("RemainingTimeToAction", ListSortDirection.Ascending));
 
                 // All of the below is unused, keeping it for the ticket notification stuff
                 XmlDocument TicketXml = new XmlDocument();
@@ -308,28 +308,5 @@ namespace CloudOps_Assistant
 
             MainWindow.LastNotificationTime = DateTime.UtcNow;
         }
-    }
-
-    public class Ticket
-    {
-        public DateTime CreateDate { get; set; }
-        public DateTime AssignedDate { get; set; }
-        public DateTime AssignedDateCorrected { get; set; }
-        public string StatusCode { get; set; }
-        public string Subject { get; set; }
-        public string TicketNumber { get; set; }
-        public List<TicketHistory> TicketHistoryList = new List<TicketHistory>();
-        public string Urgency { get; set; }
-        public DateTime DueTime { get; set; }
-        public TimeSpan OpenTime { get; set; }
-        public int PercentActionTimeUsed { get; set; }
-    }
-
-    public class TicketHistory
-    {
-        public DateTime CreateDate { get; set; }
-        public string FieldName { get; set; }
-        public string OldValue { get; set; }
-        public string NewValue { get; set; }
     }
 }

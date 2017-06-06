@@ -151,14 +151,21 @@ namespace CloudOps_Assistant
                     ticket.StatusCode = TicketStatusDict[ticket.StatusCode];
                 }
 
+                // Get the time the ticket needs to be actioned in
+                ticket.RequiredTimeToAction = new TimeSpan();
+                if (MainWindow.TicketRequiredActionTimeDict.ContainsKey(ticket.Urgency))
+                {
+                    ticket.RequiredTimeToAction = MainWindow.TicketRequiredActionTimeDict[ticket.Urgency];
+                }
+
                 // Get the due time
-                ticket.DueTime = GetTicketDueTime(ticket.Urgency, ticket.AssignedDateCorrected, "both");
+                ticket.DueTime = GetTicketDueTime(ticket.RequiredTimeToAction, ticket.AssignedDateCorrected, "both");
 
                 // Get the time the ticket has been open for (in business hours)
-                ticket.OpenTime = GetTicketBusinessHoursOpenTime(ticket.AssignedDateCorrected, "both");
+                ticket.TimeHasBeenOpen = GetTicketBusinessHoursOpenTime(ticket.AssignedDateCorrected, "both");
 
-                // Get the percentage of the action time already used up
-                ticket.PercentActionTimeUsed = GetTicketActionTimePercent(ticket.OpenTime, ticket.Urgency);
+                // Calculate the remaining time left to action the ticket
+                ticket.RemainingTimeToAction = ticket.RequiredTimeToAction - ticket.TimeHasBeenOpen;
 
                 TicketsOutput.Add(ticket);
             }
@@ -166,18 +173,12 @@ namespace CloudOps_Assistant
             return TicketsOutput;
         }
 
-        public static DateTime GetTicketDueTime(string urgency, DateTime assigned, string region)
+        public static DateTime GetTicketDueTime(TimeSpan actionTime, DateTime assigned, string region)
         {
             TimeSpan OpenTime = new TimeSpan(08, 00, 00);
             TimeSpan CloseTime = new TimeSpan(24, 00, 00);
-            TimeSpan ActionTime = new TimeSpan();
 
             DateTime Start = assigned;
-
-            if (MainWindow.TicketRequiredActionTimeDict.ContainsKey(urgency))
-            {
-                ActionTime = MainWindow.TicketRequiredActionTimeDict[urgency];
-            }
 
             // Adjust start time to always be inside business hours
             if (Start < (Start.Date + OpenTime))
@@ -204,7 +205,7 @@ namespace CloudOps_Assistant
                 Start = Start + new TimeSpan(1, 00, 00, 00);
             }
 
-            DateTime DueTime = Start + ActionTime;
+            DateTime DueTime = Start + actionTime;
             DateTime DayEnd = Start.Date + CloseTime;
             
             // While due time is after business hours, bump it to the next day
@@ -220,12 +221,12 @@ namespace CloudOps_Assistant
                 if (DueTime.DayOfWeek == DayOfWeek.Saturday)
                 {
                     // Move to Monday morning
-                    DueTime = DueTime + new TimeSpan(2, 00, 00, 00);
+                    DueTime = DueTime.Date + new TimeSpan(2, 00, 00, 00) + OpenTime + Remainder;
                 }
                 else if (DueTime.DayOfWeek == DayOfWeek.Sunday)
                 {
                     // Move to Monday morning
-                    DueTime = DueTime + new TimeSpan(1, 00, 00, 00);
+                    DueTime = DueTime.Date + new TimeSpan(1, 00, 00, 00) + OpenTime + Remainder;
                 }
 
                 // Reset day end based on the new ticket DueTime
@@ -243,6 +244,12 @@ namespace CloudOps_Assistant
 
             DateTime AssessDate = assigned; // Assess date moves forwards until today's date and is used to assess durations
 
+            // Straight up deduct the time the ticket was opened from UsedTime, if it was opened during office hours - we'll add this back later on
+            if (AssessDate.TimeOfDay > OpenTime && AssessDate.TimeOfDay < CloseTime)
+            {
+                UsedTime = UsedTime - (AssessDate.TimeOfDay - OpenTime);
+            }
+
             // Adjust assess time to always be inside business hours
             if (AssessDate < (AssessDate.Date + OpenTime))
             {
@@ -253,24 +260,24 @@ namespace CloudOps_Assistant
             {
                 // Assess time is after business hours end - push to start of NEXT business day
                 // US tickets being assigned after midnight UTC count as the morning of the next UTC day, and are handled above
-                AssessDate = AssessDate.Date + OpenTime + new TimeSpan(1, 00, 00, 00);
+                AssessDate = AssessDate.Date + new TimeSpan(1, 00, 00, 00) + OpenTime;
             }
 
             // Adjust to skip weekends
             if (AssessDate.DayOfWeek == DayOfWeek.Saturday)
             {
                 // Move to Monday morning
-                AssessDate = AssessDate + new TimeSpan(2, 00, 00, 00);
+                AssessDate = AssessDate + new TimeSpan(2, 00, 00, 00) + OpenTime;
             }
             else if (AssessDate.DayOfWeek == DayOfWeek.Sunday)
             {
                 // Move to Monday morning
-                AssessDate = AssessDate + new TimeSpan(1, 00, 00, 00);
+                AssessDate = AssessDate + new TimeSpan(1, 00, 00, 00) + OpenTime;
             }
 
             DateTime TimeNow = DateTime.UtcNow;
 
-            // If AssessDate is before today, mega maths; else just assess for today
+            // If AssessDate is before today, mega maths
             if (AssessDate.Date < TimeNow.Date)
             {
                 // Loop until on the current day
@@ -283,50 +290,30 @@ namespace CloudOps_Assistant
                     if (AssessDate.DayOfWeek == DayOfWeek.Saturday)
                     {
                         // Move to Monday morning
-                        AssessDate = AssessDate + new TimeSpan(2, 00, 00, 00);
+                        AssessDate = AssessDate.Date + new TimeSpan(2, 00, 00, 00) + OpenTime;
                     }
                     else if (AssessDate.DayOfWeek == DayOfWeek.Sunday)
                     {
                         // Move to Monday morning
-                        AssessDate = AssessDate + new TimeSpan(1, 00, 00, 00);
+                        AssessDate = AssessDate.Date + new TimeSpan(1, 00, 00, 00) + OpenTime;
                     }
 
                     // Add the day's business hours to UsedTime
                     UsedTime = UsedTime + (CloseTime - OpenTime);
                 }
-
-                // AssessDate is now on the current day
-                // Move AssessDate to the day start
-                AssessDate = AssessDate.Date + OpenTime;
-
-                // If current time is after the day start, maths - else keep UsedTime as-is
-                if (TimeNow > (TimeNow.Date + OpenTime))
-                {
-                    // If current time is before the day end, maths - else add today's business hours to UsedTime
-                    if (TimeNow < (TimeNow.Date + CloseTime))
-                    {
-                        UsedTime = UsedTime + (TimeNow.TimeOfDay - OpenTime);
-                    }
-                    else
-                    {
-                        UsedTime = UsedTime + (CloseTime - OpenTime);
-                    }
-                }
             }
-            else
+
+            // If current time is after the day start, maths - else keep UsedTime as-is
+            if (TimeNow > (TimeNow.Date + OpenTime))
             {
-                // If current time is after the day start, maths - else keep UsedTime as-is
-                if (TimeNow > (TimeNow.Date + OpenTime))
+                // If current time is before the day end, maths - else add today's business hours to UsedTime
+                if (TimeNow < (TimeNow.Date + CloseTime))
                 {
-                    // If current time is before the day end, maths - else add today's business hours to UsedTime
-                    if (TimeNow < (TimeNow.Date + CloseTime))
-                    {
-                        UsedTime = UsedTime + (TimeNow.TimeOfDay - AssessDate.TimeOfDay);
-                    }
-                    else
-                    {
-                        UsedTime = UsedTime + (CloseTime - OpenTime);
-                    }
+                    UsedTime = UsedTime + (TimeNow.TimeOfDay - OpenTime);
+                }
+                else
+                {
+                    UsedTime = UsedTime + (CloseTime - OpenTime);
                 }
             }
 
@@ -542,6 +529,30 @@ namespace CloudOps_Assistant
 
             return xmlOutput;
         }
+    }
+
+    public class Ticket
+    {
+        public DateTime CreateDate { get; set; }
+        public DateTime AssignedDate { get; set; }
+        public DateTime AssignedDateCorrected { get; set; }
+        public string StatusCode { get; set; }
+        public string Subject { get; set; }
+        public string TicketNumber { get; set; }
+        public List<TicketHistory> TicketHistoryList = new List<TicketHistory>();
+        public string Urgency { get; set; }
+        public DateTime DueTime { get; set; }
+        public TimeSpan TimeHasBeenOpen { get; set; }
+        public TimeSpan RequiredTimeToAction { get; set; }
+        public TimeSpan RemainingTimeToAction { get; set; }
+    }
+
+    public class TicketHistory
+    {
+        public DateTime CreateDate { get; set; }
+        public string FieldName { get; set; }
+        public string OldValue { get; set; }
+        public string NewValue { get; set; }
     }
 
     public class MyPolicy : ICertificatePolicy
